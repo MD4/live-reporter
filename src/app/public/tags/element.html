@@ -1,0 +1,34 @@
+<element>
+
+    <div id="element"></div>
+
+    <script>
+
+        this.on('update', function () {
+            if (isSuite(opts.element)) {
+                riot.mount(
+                        this.element,
+                        'suite',
+                        {
+                            element: opts.element,
+                            name: opts.name
+                        }
+                )
+            } else {
+                riot.mount(
+                        this.element,
+                        'test',
+                        {
+                            element: opts.element,
+                            name: opts.name
+                        }
+                )
+            }
+        });
+
+        function isSuite(element) {
+            return !element.type;
+        }
+    </script>
+
+</element>

@@ -1,32 +1,67 @@
+var io = require('socket.io-client');
+
 module.exports = Live;
 
-function Live(options) {
+function Live(ready, options) {
     options = options || {};
 
-    options.url = options.url || 'ws://127.0.0.1:3000';
+    options.url = options.url || 'ws://localhost:3000';
 
-    return function Live(runner) {
+    var socket = io(options.url);
 
-        runner.on('start', function () {
-            console.log('start', host);
+    socket.on('connect', function () {
+        ready();
+    });
+    socket.on('disconnect', function () {
+    });
+
+    return function (runner) {
+
+        runner.on('start', () => {
+            socket.emit('start');
         });
 
-        runner.on('pending', function () {
-            console.log('start', arguments);
+        runner.on('pending', () => {
+            socket.emit('pending');
         });
 
-        runner.on('pass', function (test) {
-            console.log('pass', arguments);
+        runner.on('pass', (test) => {
+            socket.emit(
+                'pass',
+                _getTest(test)
+            );
         });
 
-        runner.on('fail', function () {
-            console.log('fail', arguments);
+        runner.on('fail', (test) => {
+            socket.emit(
+                'fail',
+                _getTest(test)
+            );
         });
 
-        runner.on('end', function () {
-            console.log('end', arguments);
+        runner.on('end', () => {
+            socket.emit('end');
+            socket.close();
         });
     };
 }
 
+function _getTest(test) {
+    return {
+        'title': test.title,
+        'type': test.type,
+        'body': test.body,
+        'file': test.file,
+        'path': _getPath(test.parent),
+        'duration': test.duration,
+        'state': test.state
+    };
+}
+
+function _getPath(suite) {
+    if (suite.parent) {
+        return _getPath(suite.parent).concat([suite.title])
+    }
+    return [];
+}
 
