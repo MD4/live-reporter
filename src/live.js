@@ -1,20 +1,23 @@
 var io = require('socket.io-client');
+var app = require('./app/app');
 
 module.exports = Live;
 
 function Live(ready, options) {
     options = options || {};
+    options.host = options.host || 'localhost';
+    options.port = options.port || 3000;
 
-    options.url = options.url || 'ws://localhost:3000';
+    var socket = io('ws://' + options.host + ':' + options.port);
 
-    var socket = io(options.url);
-
-    socket.on('connect', function () {
-        ready();
+    app.start(options, function () {
+        console.log('Live reporter UI available at localhost:%s', options.port);
+        socket.on('connect', function () {
+            ready();
+        });
     });
 
     return function (runner) {
-
         runner.on('start', () => {
             socket.emit('start');
         });
@@ -30,7 +33,8 @@ function Live(ready, options) {
             );
         });
 
-        runner.on('fail', (test) => {
+        runner.on('fail', (test, err) => {
+            test.err = err;
             socket.emit(
                 'fail',
                 _getTest(test)
@@ -51,13 +55,14 @@ function _getTest(test) {
         'file': test.file,
         'path': _getPath(test.parent),
         'duration': test.duration,
-        'state': test.state
+        'state': test.state,
+        'err': test.err
     };
 }
 
 function _getPath(suite) {
     if (suite.parent) {
-        return _getPath(suite.parent).concat([suite.title])
+        return _getPath(suite.parent).concat([ suite.title ])
     }
     return [];
 }

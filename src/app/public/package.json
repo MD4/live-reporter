@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "riot-compiler": "^3.0.0-alpha.1",
-    "riotjs": "^1.0.4",
     "socket.io-client": "^1.4.5"
   }
 }

@@ -3,34 +3,59 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-app.use(express.static('./src/app/public'));
+module.exports.start = _start;
 
-io.on('connection', function (socket) {
-    console.log('.');
+var cache = [];
 
-    socket.on('start', () => {
-        socket.broadcast.emit('start');
+function _start(options, done) {
+    options = options || {};
+    options.port = options.port || 3000;
+
+    app.use(express.static('./src/app/public'));
+
+    io.on('connection', function (socket) {
+
+        _replayCache(socket);
+
+        socket.on('start', () => {
+            _cache('start');
+            socket.broadcast.emit('start');
+        });
+
+        socket.on('pending', () => {
+            _cache('pending');
+            socket.broadcast.emit('pending');
+        });
+
+        socket.on('pass', (test) => {
+            _cache('pass', test);
+            socket.broadcast.emit('pass', test);
+        });
+
+        socket.on('fail', (test) => {
+            _cache('fail', test);
+            socket.broadcast.emit('fail', test);
+        });
+
+        socket.on('end', () => {
+            _cache('end');
+            socket.broadcast.emit('end');
+        });
     });
 
-    socket.on('pending', () => {
-        socket.broadcast.emit('pending');
-    });
+    http.listen(options.port, done);
+}
 
-    socket.on('pass', (test) => {
-        socket.broadcast.emit('pass', test);
-    });
+function _replayCache(socket) {
+    if (!cache) return;
+    cache.forEach(function (event) {
+        socket.emit(event.event, event.args)
+    })
+}
 
-    socket.on('fail', (test) => {
-        socket.broadcast.emit('fail', test);
-    });
-
-    socket.on('end', () => {
-        socket.broadcast.emit('end');
-    });
-
-});
-
-http.listen(3000, function () {
-    console.log('listening on *:3000');
-});
-
+function _cache(event, args) {
+    if (event == 'start') {
+        cache = [];
+    }
+    cache.push({ event, args });
+}

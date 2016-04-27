@@ -6,7 +6,7 @@ const liveBuilder = require('./src/live');
 var live = null;
 
 gulp.task('connect-live', (done) => {
-    live = liveBuilder(done, {url: 'http://localhost:3000'});
+    live = liveBuilder(done, { url: 'http://localhost:3000' });
 });
 
 gulp.task('test', () => {
@@ -17,5 +17,7 @@ gulp.task('test', () => {
 });
 
 gulp.task('default', [ 'connect-live' ], function () {
-    return gulp.watch([ 'test/**' ], [ 'test' ]);
+    return gulp
+        .watch([ 'test/**/*.js', 'src/**/*.js' ], [ 'test' ])
+        .on('error', function() {});
 });
