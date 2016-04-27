@@ -6,6 +6,7 @@ var io = require('socket.io')(http);
 app.use(express.static('./src/app/public'));
 
 io.on('connection', function (socket) {
+    console.log('.');
 
     socket.on('start', () => {
         socket.broadcast.emit('start');

@@ -12,8 +12,6 @@ function Live(ready, options) {
     socket.on('connect', function () {
         ready();
     });
-    socket.on('disconnect', function () {
-    });
 
     return function (runner) {
 
@@ -41,7 +39,6 @@ function Live(ready, options) {
 
         runner.on('end', () => {
             socket.emit('end');
-            socket.close();
         });
     };
 }
