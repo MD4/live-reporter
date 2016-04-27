@@ -110,10 +110,27 @@
         .failed .details {
             display: block;
         }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            border-radius: 4px;
+            background-color: #8a6343;
+            transition: width 200ms;
+        }
     </style>
 
 </head>
 <body>
+
+<div class="progress-container">
+    <div id="progress" class="progress-bar"></div>
+</div>
 
 <div id="container"></div>
 
@@ -124,9 +141,13 @@
         var socket = io.connect('http://localhost:3000');
 
         this._root = {};
+        this.total = 0;
+        this.done = 0;
 
-        socket.on('start', function () {
+        socket.on('start', function (info) {
             this._root = {};
+            this.total = info.total;
+            this.done = 0;
             var $tests = document.getElementsByClassName('test');
             Array.prototype.forEach.call($tests, function ($test) {
                 $test.setAttribute('class', 'test pending');
@@ -135,6 +156,12 @@
 
         socket.on('pass', testUpdated.bind(this));
         socket.on('fail', testUpdated.bind(this));
+
+        var updateProgress = function() {
+            var width = (++this.done * 100) / this.total;
+            document.getElementById('progress')
+                    .style.width = width + '%';
+        }.bind(this);
 
         function testUpdated(test) {
             var $container = document.getElementById('container');
@@ -147,6 +174,8 @@
                 var $suite = getSuiteElement($container, test.path);
                 $suite.appendChild(createTestElement(test));
             }
+
+            updateProgress();
         }
 
         function getTestElement(test) {

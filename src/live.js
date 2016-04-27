@@ -19,10 +19,12 @@ function Live(ready, options) {
 
     return function (runner) {
         runner.on('start', () => {
-            socket.emit('start');
+            console.log(arguments);
+            socket.emit('start', {total: runner.total});
         });
 
         runner.on('pending', () => {
+            console.log(arguments);
             socket.emit('pending');
         });
 

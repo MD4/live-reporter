@@ -17,9 +17,9 @@ function _start(options, done) {
 
         _replayCache(socket);
 
-        socket.on('start', () => {
-            _cache('start');
-            socket.broadcast.emit('start');
+        socket.on('start', (info) => {
+            _cache('start', info);
+            socket.broadcast.emit('start', info);
         });
 
         socket.on('pending', () => {
