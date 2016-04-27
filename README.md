@@ -2,7 +2,7 @@
 A (really) quick & (really) dirty prototype of a mocha live in-browser reporter
 
 ## Notes
-The code is really really shitty.
+As a prototype, the code is really really shitty. :poop:
 A "neat" version is being to be developed soon.
 
 ## installation
