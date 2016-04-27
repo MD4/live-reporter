@@ -16,7 +16,7 @@ gulp.task('test', () => {
     ).pipe(mocha({ reporter: live }));
 });
 
-gulp.task('default', [ 'connect-live' ], function () {
+gulp.task('default', [ 'connect-live', 'test' ], function () {
     return gulp
         .watch([ 'test/**/*.js', 'src/**/*.js' ], [ 'test' ])
         .on('error', function() {});

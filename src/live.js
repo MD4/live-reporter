@@ -11,7 +11,7 @@ function Live(ready, options) {
     var socket = io('ws://' + options.host + ':' + options.port);
 
     app.start(options, function () {
-        console.log('Live reporter UI available at localhost:%s', options.port);
+        console.log('Live reporter UI available at http://localhost:%s', options.port);
         socket.on('connect', function () {
             ready();
         });
@@ -19,12 +19,10 @@ function Live(ready, options) {
 
     return function (runner) {
         runner.on('start', () => {
-            console.log(arguments);
             socket.emit('start', {total: runner.total});
         });
 
         runner.on('pending', () => {
-            console.log(arguments);
             socket.emit('pending');
         });
 
