@@ -8,7 +8,7 @@ module.exports.sub = function(a, b) {
 };
 
 module.exports.mul = function(a, b) {
-    return a ^ b; // oops, bug !
+    return a + b; // oops, bug !
 };
 
 module.exports.div = function(a, b) {
